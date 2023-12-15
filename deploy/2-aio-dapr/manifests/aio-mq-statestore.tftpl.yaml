@@ -1,0 +1,19 @@
+# State Management component
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: ${aio_dapr_statestore_component_name}
+spec:
+  type: state.aio-mq-statestore-pluggable # DO NOT CHANGE
+  version: v1
+  metadata:
+    - name: url
+      value: "${aio_mq_frontend_server}:${aio_mq_frontend_server_port}"
+    - name: satTokenPath
+      value: "/var/run/secrets/tokens/mqtt-client-token"
+    - name: tlsEnabled
+      value: ${should_enable_tls}
+    - name: caCertPath
+      value: "/var/run/certs/aio-mq-ca-cert/ca.crt"
+    - name: logLevel
+      value: "Info"

@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-sink-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-sink
+  template:
+    metadata:
+      labels:
+        app: mqtt-sink
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/unix-domain-socket-path: "/tmp/dapr-components-sockets"
+        dapr.io/app-id: "mqtt-sink"
+        dapr.io/app-port: "6037"
+        dapr.io/app-protocol: "http"
+    spec:
+      serviceAccountName: mqtt-sink
+      imagePullSecrets:
+        - name: acr-pull-secret
+
+      volumes:
+        - name: dapr-unix-domain-socket
+          emptyDir: {}
+        
+        # SAT token used to authenticate between Dapr and the MQTT broker
+        - name: mqtt-client-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: mqtt-client-token
+                  audience: aio-mq
+                  expirationSeconds: 86400
+        
+        # Certificate chain for Dapr to validate the MQTT broker
+        - name: aio-ca-trust-bundle
+          configMap:
+            name: aio-ca-trust-bundle
+
+      containers:
+        # Container for the dapr quickstart application 
+        - name: mq-sink
+          image: ${acr_name}.azurecr.io/${mqtt_sink_image}:${mqtt_sink_version}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://*:6037"
+          ports:
+            - containerPort: 6037
+              name: http
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /healthz
+        
+        # Container for the Pub/sub component
+        - name: aio-mq-pubsub-pluggable
+          image: ghcr.io/azure/iot-mq-dapr-components/pubsub:latest
+          volumeMounts:
+            - name: dapr-unix-domain-socket
+              mountPath: /tmp/dapr-components-sockets
+            - name: mqtt-client-token
+              mountPath: /var/run/secrets/tokens
+            - name: aio-ca-trust-bundle
+              mountPath: /var/run/certs/aio-mq-ca-cert/
+              
+        # Container for the State Management component
+        - name: aio-mq-statestore-pluggable
+          image: ghcr.io/azure/iot-mq-dapr-components/statestore:latest
+          volumeMounts:
+            - name: dapr-unix-domain-socket
+              mountPath: /tmp/dapr-components-sockets
+            - name: mqtt-client-token
+              mountPath: /var/run/secrets/tokens
+            - name: aio-ca-trust-bundle
+              mountPath: /var/run/certs/aio-mq-ca-cert/

@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MqttSink", "src\MqttSink\MqttSink.csproj", "{A88AAA66-7CA8-44F2-88F8-F25C500DA065}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A88AAA66-7CA8-44F2-88F8-F25C500DA065}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A88AAA66-7CA8-44F2-88F8-F25C500DA065}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A88AAA66-7CA8-44F2-88F8-F25C500DA065}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A88AAA66-7CA8-44F2-88F8-F25C500DA065}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
