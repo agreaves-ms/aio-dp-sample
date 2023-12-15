@@ -31,14 +31,20 @@ variable "aio_cluster_namespace" {
   default     = "aio"
 }
 
-variable "acr_pull_secret_name" {
-  description = "(Optional) The imagePullSecret Secret name. (Otherwise, 'acr-pull-secret')"
+variable "aio_custom_locations_name" {
+  description = "(Optional) the AIO Custom Locations resource name. (Otherwise, 'cl-<var.name>-aio')"
   type        = string
-  default     = "acr-pull-secret"
+  default     = null
 }
 
-variable "should_create_service_principal" {
-  description = "(Optional) Should create the Service Principal which will be used by the cluster to pull ACR images. (Otherwise, 'true')"
-  type        = bool
-  default     = true
+variable "aio_targets_main_version" {
+  description = "(Optional) The version of the Targets that's deployed using AIO. (Otherwise, '1.0.0')"
+  type        = string
+  default     = "1.0.0"
+}
+
+variable "aio_mq_name" {
+  description = "(Optional) The AIO MQ Arc Extension name. (Otherwise, 'mq')"
+  type        = string
+  default     = "mq"
 }

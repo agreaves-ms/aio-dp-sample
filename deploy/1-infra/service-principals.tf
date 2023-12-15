@@ -1,6 +1,8 @@
 data "azurerm_client_config" "current" {
 }
 
+// ACR Pull Service Principal
+
 resource "azuread_application" "acr_pull_sp" {
   count        = var.should_create_service_principal ? 1 : 0
   display_name = "sp-${var.name}-acr-pull"
@@ -31,4 +33,26 @@ resource "local_sensitive_file" "acr_pull_secret" {
     acr_pull_sp_client_id     = azuread_service_principal.acr_pull_sp[0].client_id
     acr_pull_sp_client_secret = azuread_application_password.acr_pull_sp[0].value
   })
+}
+
+// AIO Data Processor Connector Service Principal
+
+resource "azuread_application" "aio_connector_sp" {
+  count        = var.should_create_service_principal ? 1 : 0
+  display_name = "sp-${var.name}-aio-conn"
+  owners       = [data.azurerm_client_config.current.object_id]
+}
+
+resource "azuread_application_password" "aio_connector_sp" {
+  count             = var.should_create_service_principal ? 1 : 0
+  display_name      = "rbac"
+  application_id    = "/applications/${azuread_application.aio_connector_sp[0].object_id}"
+  end_date_relative = "4383h" // valid for 6 months then must be rotated for continued use.
+}
+
+resource "azuread_service_principal" "aio_connector_sp" {
+  count           = var.should_create_service_principal ? 1 : 0
+  client_id       = azuread_application.aio_connector_sp[0].client_id
+  account_enabled = true
+  owners          = [data.azurerm_client_config.current.object_id]
 }

@@ -1,0 +1,12 @@
+apiVersion: mq.iotoperations.azure.com/v1beta1
+kind: MqttBridgeTopicMap
+metadata:
+  name: aio-mqtt-bridge-topic-map
+  namespace: aio
+spec:
+  mqttBridgeConnectorRef: aio-mqtt-bridge
+  routes:
+    - direction: local-to-remote
+      name: aio-mq-to-evgn-mq
+      qos: 1
+      source: "#"
